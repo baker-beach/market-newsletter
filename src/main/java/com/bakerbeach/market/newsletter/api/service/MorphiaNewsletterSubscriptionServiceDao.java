@@ -2,7 +2,9 @@ package com.bakerbeach.market.newsletter.api.service;
 
 import java.util.Date;
 
-import org.springframework.data.mongodb.core.MongoTemplate;
+import org.mongodb.morphia.Datastore;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 
 import com.bakerbeach.market.newsletter.api.model.NewsletterSubscription;
 import com.mongodb.BasicDBObject;
@@ -11,26 +13,13 @@ import com.mongodb.DBObject;
 import com.mongodb.QueryBuilder;
 import com.mongodb.WriteResult;
 
-public class SimpleNewsletterSubscriptionServiceDao implements NewsletterSubscriptionServiceDao {
+public class MorphiaNewsletterSubscriptionServiceDao implements NewsletterSubscriptionServiceDao {
 	private static final String SUBSCRIPTION_COLLECTION_NAME = "newsletter_sbscriptions";
-
-	private MongoTemplate mongoTemplate;
-
-	public boolean __update(NewsletterSubscription subscription) {
-		QueryBuilder q = new QueryBuilder();
-		q.and("email").is(subscription.getEmail()).and("newsletter_code").is(subscription.getNewsletterCode());
-
-		DBObject u = encodeNewsletterSubscription(subscription);
-
-		DBCollection collection = mongoTemplate.getCollection(SUBSCRIPTION_COLLECTION_NAME);
-		WriteResult result = collection.update(q.get(), u, true, false);
-		return result.isUpdateOfExisting();
-	}
-
-	/* (non-Javadoc)
-	 * @see com.bakerbeach.market.newsletter.api.service.NewsletterSubscriptionServiceDao#update(com.bakerbeach.market.newsletter.api.model.NewsletterSubscription)
-	 */
-	@Override
+	
+	@Autowired(required = false)
+	@Qualifier("shopDatastore")
+	private Datastore datastore;
+	
 	public boolean update(NewsletterSubscription subscription) {
 		QueryBuilder q = new QueryBuilder();
 		q.and("email").is(subscription.getEmail()).and("newsletter_code").is(subscription.getNewsletterCode());
@@ -51,20 +40,17 @@ public class SimpleNewsletterSubscriptionServiceDao implements NewsletterSubscri
 		u.append("$setOnInsert", new BasicDBObject("email", subscription.getEmail()).append("newsletter_code", subscription.getNewsletterCode()));
 		u.append("$push", new BasicDBObject("booking", new BasicDBObject("status", subscription.getStatus()).append("date", date)));
 		
-		DBCollection collection = mongoTemplate.getCollection(SUBSCRIPTION_COLLECTION_NAME);
+		DBCollection collection = datastore.getDB().getCollection(SUBSCRIPTION_COLLECTION_NAME);
 		WriteResult result = collection.update(q.get(), u, true, false);
 		return result.isUpdateOfExisting();
 	}
-		
-	/* (non-Javadoc)
-	 * @see com.bakerbeach.market.newsletter.api.service.NewsletterSubscriptionServiceDao#findByEmail(java.lang.String)
-	 */
+
 	@Override
 	public NewsletterSubscription findByEmail(String email) {
 		QueryBuilder q = new QueryBuilder();
 		q.and("email").is(email);
 		
-		DBCollection collection = mongoTemplate.getCollection(SUBSCRIPTION_COLLECTION_NAME);
+		DBCollection collection = datastore.getDB().getCollection(SUBSCRIPTION_COLLECTION_NAME);
 		DBObject dbo = collection.findOne(q.get());
 		
 		if (dbo != null) {
@@ -73,7 +59,7 @@ public class SimpleNewsletterSubscriptionServiceDao implements NewsletterSubscri
 			return null;
 		}
 	}
-	
+
 	private NewsletterSubscription decodeNewsletterSubscription(DBObject dbo) {
 		NewsletterSubscription subscription = new NewsletterSubscription();
 		
@@ -98,36 +84,6 @@ public class SimpleNewsletterSubscriptionServiceDao implements NewsletterSubscri
 		subscription.setStatus((String) dbo.get("status"));
 		
 		return subscription;
-	}
-
-	private DBObject encodeNewsletterSubscription(NewsletterSubscription subscription) {
-		DBObject dbo = new BasicDBObject();
-
-		if (subscription.getPrefix() != null) {
-			dbo.put("prefix", subscription.getPrefix());
-		}
-
-		if (subscription.getFirstName() != null) {
-			dbo.put("first_name", subscription.getFirstName());
-		}
-
-		if (subscription.getLastName() != null) {
-			dbo.put("last_name", subscription.getLastName());
-		}
-
-		dbo.put("newsletter_code", subscription.getNewsletterCode());
-
-		dbo.put("email", subscription.getEmail());
-		
-		dbo.put("last_update", subscription.getLastUpdate());
-
-		dbo.put("status", subscription.getStatus());
-
-		return dbo;
-	}
-
-	public void setMongoTemplate(MongoTemplate mongoTemplate) {
-		this.mongoTemplate = mongoTemplate;
 	}
 
 }

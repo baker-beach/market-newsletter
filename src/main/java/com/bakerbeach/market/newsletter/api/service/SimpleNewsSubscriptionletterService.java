@@ -6,8 +6,8 @@ import com.bakerbeach.market.newsletter.api.model.NewsletterSubscription;
 import com.bakerbeach.market.newsletter.api.service.NewsletterServiceException.AlreadySubscribedException;
 
 public class SimpleNewsSubscriptionletterService implements NewsletterSubscriptionService {
-	private SimpleNewsletterSubscriptionServiceDao newsletterDao;  
-
+	private NewsletterSubscriptionServiceDao newsletterDao;
+	
 	@Override
 	public void subscribe(String prefix, String firstName, String lastName, String email, String newsletterCode, String status) throws NewsletterServiceException {
 		NewsletterSubscription subscription = new NewsletterSubscription();
@@ -33,7 +33,7 @@ public class SimpleNewsSubscriptionletterService implements NewsletterSubscripti
 		return subscription;
 	}
 
-	public void setNewsletterDao(SimpleNewsletterSubscriptionServiceDao newsletterDao) {
+	public void setNewsletterDao(NewsletterSubscriptionServiceDao newsletterDao) {
 		this.newsletterDao = newsletterDao;
 	}
 
