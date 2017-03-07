@@ -1,9 +1,11 @@
-package com.bakerbeach.market.newsletter.api.service;
+package com.bakerbeach.market.newsletter.service;
 
 import java.util.Date;
 
 import com.bakerbeach.market.newsletter.api.model.NewsletterSubscription;
+import com.bakerbeach.market.newsletter.api.service.NewsletterServiceException;
 import com.bakerbeach.market.newsletter.api.service.NewsletterServiceException.AlreadySubscribedException;
+import com.bakerbeach.market.newsletter.api.service.NewsletterSubscriptionService;
 
 public class SimpleNewsSubscriptionletterService implements NewsletterSubscriptionService {
 	private NewsletterSubscriptionServiceDao newsletterDao;

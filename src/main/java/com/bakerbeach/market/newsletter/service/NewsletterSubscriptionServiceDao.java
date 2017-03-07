@@ -1,4 +1,4 @@
-package com.bakerbeach.market.newsletter.api.service;
+package com.bakerbeach.market.newsletter.service;
 
 import com.bakerbeach.market.newsletter.api.model.NewsletterSubscription;
 
