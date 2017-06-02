@@ -20,7 +20,7 @@
 		<dependency>
 			<groupId>com.bakerbeach.market</groupId>
 			<artifactId>market-newsletter-api</artifactId>
-			<version>1.0.0</version>
+			<version>[3.0.0]</version>
 		</dependency>
 		<dependency>
 			<groupId>com.bakerbeach.market</groupId>
